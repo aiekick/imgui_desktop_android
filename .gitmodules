@@ -1,0 +1,12 @@
+[submodule "3rdparty/ezlibs"]
+	path = 3rdparty/ezlibs
+	url = https://github.com/aiekick/EzLibs.git
+	branch = master
+[submodule "3rdparty/imguipack"]
+	path = 3rdparty/imguipack
+	url = https://github.com/aiekick/ImGuiPack.git
+	branch = master
+[submodule "3rdparty/buildinc"]
+	path = 3rdparty/buildinc
+	url = https://github.com/aiekick/BuildInc.git
+	branch = master
