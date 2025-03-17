@@ -23,9 +23,13 @@
 #include <ezlibs/ezTools.hpp>
 
 #include <stdio.h>
+#include <clocale>
 
+// resolution zenfone10
 #define BASE_WIDTH 1080
 #define BASE_HEIGHT 2286
+
+// scale for desktop app
 #define BASE_SCALE 0.4
 
 static void glfw_error_callback(int error, const char* description) {
@@ -35,6 +39,12 @@ static void glfw_error_callback(int error, const char* description) {
 // Main code
 int main(int vArgc, char** vArgv) {
     ez::App app(vArgc, vArgv);
+
+    auto loc = std::setlocale(LC_ALL, ".UTF8");
+    if (!loc) {
+        printf("setlocale fail to apply with this compiler. it seems the unicode will be NOK\n");
+    }
+
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
         return 1;
@@ -59,9 +69,16 @@ int main(int vArgc, char** vArgv) {
     }
 
     Backend backend;
-    Frontend frontend;
+    if (!backend.init()) {
+        return false;
+    }
 
-    backend.initImGui(app.getAppPath(), 22.0f * 0.9f, 1.0f);
+    Frontend frontend(backend);
+
+    backend.initImGui(app.getAppPath(), 20.0f, 1.33f);
+    if (!frontend.init()) {
+        return false;
+    }
 
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -113,7 +130,9 @@ int main(int vArgc, char** vArgv) {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
 
+    frontend.unit();
     backend.unitImGui();
+    backend.unit();
 
     glfwDestroyWindow(window);
     glfwTerminate();

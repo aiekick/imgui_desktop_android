@@ -1,4 +1,4 @@
-package com.funparadigm.stocktrend
+package com.org.imgui_destop_android
 
 import android.app.NativeActivity
 import android.os.Bundle

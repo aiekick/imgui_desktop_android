@@ -33,7 +33,7 @@ static bool g_Initialized = false;
 static char g_LogTag[] = "ImGuiExample";
 static std::string g_IniFilename = "";
 static Backend g_backend;
-static Frontend g_frontend;
+static Frontend g_frontend(g_backend);
 static ez::ivec2 g_display_size;
 
 // Forward declarations of helper functions
@@ -41,6 +41,7 @@ static void Init(struct android_app* app);
 static void Shutdown();
 static void MainLoopStep();
 static int ShowSoftKeyboardInput();
+static int HideSoftKeyboardInput();
 static int PollUnicodeChars();
 static int GetAssetData(const char* filename, void** out_data);
 
@@ -130,7 +131,14 @@ void Init(struct android_app* app) {
         eglMakeCurrent(g_EglDisplay, g_EglSurface, g_EglSurface, g_EglContext);
     }
 
-    g_backend.initImGui(app->activity->internalDataPath, 22.0f * 2.0f, 3.0f);
+    if (!g_backend.init()) {
+        return;
+    }
+	
+    g_backend.initImGui(app->activity->internalDataPath, 22.0f, 3.0f);
+    if (!g_frontend.init()) {
+        return;
+    }
 
     // Redirect loading/saving of .ini file to our location.
     // Make sure 'g_IniFilename' persists while we use Dear ImGui.
@@ -165,6 +173,9 @@ void MainLoopStep() {
     static bool WantTextInputLast = false;
     if (io.WantTextInput && !WantTextInputLast) {
         ShowSoftKeyboardInput();
+    }
+    if (WantTextInputLast && !io.WantTextInput) {
+        HideSoftKeyboardInput();
     }
     WantTextInputLast = io.WantTextInput;
 
@@ -202,7 +213,9 @@ void Shutdown() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplAndroid_Shutdown();
 
+    g_frontend.unit();
     g_backend.unitImGui();
+    g_backend.unit();
 
     if (g_EglDisplay != EGL_NO_DISPLAY) {
         eglMakeCurrent(g_EglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -246,6 +259,35 @@ static int ShowSoftKeyboardInput() {
         return -3;
 
     jmethodID method_id = java_env->GetMethodID(native_activity_clazz, "showSoftInput", "()V");
+    if (method_id == nullptr)
+        return -4;
+
+    java_env->CallVoidMethod(g_App->activity->clazz, method_id);
+
+    jni_return = java_vm->DetachCurrentThread();
+    if (jni_return != JNI_OK)
+        return -5;
+
+    return 0;
+}
+
+static int HideSoftKeyboardInput() {
+    JavaVM* java_vm = g_App->activity->vm;
+    JNIEnv* java_env = nullptr;
+
+    jint jni_return = java_vm->GetEnv((void**)&java_env, JNI_VERSION_1_6);
+    if (jni_return == JNI_ERR)
+        return -1;
+
+    jni_return = java_vm->AttachCurrentThread(&java_env, nullptr);
+    if (jni_return != JNI_OK)
+        return -2;
+
+    jclass native_activity_clazz = java_env->GetObjectClass(g_App->activity->clazz);
+    if (native_activity_clazz == nullptr)
+        return -3;
+
+    jmethodID method_id = java_env->GetMethodID(native_activity_clazz, "hideSoftInput", "()V");
     if (method_id == nullptr)
         return -4;
 

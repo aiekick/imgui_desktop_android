@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(PROJECT StockTrend)
+set(PROJECT imgui_destop_android)
 
 project(${PROJECT} CXX)
 enable_language(C CXX)
@@ -140,11 +140,9 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
 	set(CMAKE_SHARED_LINKER_FLAGS
 	  "${CMAKE_SHARED_LINKER_FLAGS} -u ANativeActivity_onCreate"
 	)
-
 	target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 	  IMGUI_IMPL_OPENGL_ES3
 	)
-
 	target_link_libraries(${PROJECT} PRIVATE
 		${IMGUIPACK_LIBRARIES}
 		android
@@ -157,7 +155,7 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
 		${CMAKE_SOURCE_DIR}/3rdparty
 		${ANDROID_NDK}/sources/android/native_app_glue
 	)
-	target_compile_definitions(${PROJECT} PRIVATE PLATFORM_ANDROID)
+	target_compile_definitions(${PROJECT} PRIVATE -DEZ_LOG_APP_NAME="${PROJECT}")
 else()
 	if(NOT CMAKE_DEBUG_POSTFIX)
 		set(CMAKE_DEBUG_POSTFIX _debug)
@@ -201,7 +199,7 @@ else()
 	add_subdirectory(3rdparty/buildinc)
 	add_custom_command(
 			TARGET ${PROJECT} PRE_BUILD
-			COMMAND BuildInc ${PROJECT} $<$<CONFIG:Debug>:${CMAKE_SOURCE_DIR}/src/headers/${PROJECT}Build.h> -ff ${CMAKE_SOURCE_DIR}/src/res/big.flf --no-help
+			COMMAND BuildInc ${PROJECT} $<$<CONFIG:Debug>:${CMAKE_SOURCE_DIR}/src/headers/${PROJECT}Build.h> --no-help
 	)
 endif()
 

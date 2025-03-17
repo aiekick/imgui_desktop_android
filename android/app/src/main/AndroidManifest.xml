@@ -2,17 +2,17 @@
 <manifest xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="StockTrend"
+        android:label="imgui_destop_android"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:hasCode="true"
         tools:ignore="DataExtractionRules">
         <activity
-            android:name="com.funparadigm.stocktrend.MainActivity"
+            android:name="com.org.imgui_destop_android.MainActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
-            <meta-data android:name="android.app.lib_name" android:value="StockTrend" />
+            <meta-data android:name="android.app.lib_name" android:value="imgui_destop_android" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
